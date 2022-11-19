@@ -5,7 +5,7 @@ import time
 import scipy.io as sio
 import torch
 import torch.nn as nn
-from torchsummary import summary
+from torchinfo import summary
 
 import datasets
 import plots
@@ -53,7 +53,7 @@ class AutoEncoder(nn.Module):
 
     def forward(self, x):
         abu_est = self.encoder(x)
-        cls_emb = self.vtrans(abu_est)
+        cls_emb = self.vtrans(abu_est)       
         cls_emb = cls_emb.view(1, self.P, -1)
         abu_est = self.upscale(cls_emb).view(1, self.P, self.size, self.size)
         abu_est = self.smooth(abu_est)
@@ -107,6 +107,11 @@ class Train_test:
             self.data = datasets.Data(dataset, device)
             self.loader = self.data.get_loader(batch_size=self.col ** 2)
             self.init_weight = self.data.get("init_weight").unsqueeze(2).unsqueeze(3).float()
+            # col表示像素大小，L表示spectral bands，P表示端元数目
+            # LR表示Learning Rate，即初始学习率
+            # dim表示transformer之后输出的维度
+            # beta、gamma表示损失函数两个部分权重
+            # 
         else:
             raise ValueError("Unknown dataset")
 
