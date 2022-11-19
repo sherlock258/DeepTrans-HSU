@@ -55,6 +55,7 @@ class AutoEncoder(nn.Module):
         abu_est = self.encoder(x)
         cls_emb = self.vtrans(abu_est)       
         cls_emb = cls_emb.view(1, self.P, -1)
+        # P表示端元数目
         abu_est = self.upscale(cls_emb).view(1, self.P, self.size, self.size)
         abu_est = self.smooth(abu_est)
         re_result = self.decoder(abu_est)
