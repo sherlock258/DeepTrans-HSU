@@ -12,6 +12,8 @@ import plots
 import transformer
 import utils
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class AutoEncoder(nn.Module):
     def __init__(self, P, L, size, patch, dim):
@@ -112,7 +114,8 @@ class Train_test:
             # LR表示Learning Rate，即初始学习率
             # dim表示transformer之后输出的维度
             # beta、gamma表示损失函数两个部分权重
-            # 
+            # 这里的init_weight应该是给后面decoder进行初始化的，即这里的init_weight和endmember维度相同
+            # 最后init_weight的维度变成(156,3,1,1)，以samson为例
         else:
             raise ValueError("Unknown dataset")
 
@@ -126,6 +129,7 @@ class Train_test:
         net.apply(net.weights_init)
 
         model_dict = net.state_dict()
+        # state_dict returns a dictionary containing a whole state of the module. 
         model_dict['decoder.0.weight'] = self.init_weight
         net.load_state_dict(model_dict)
 
@@ -158,6 +162,7 @@ class Train_test:
                     optimizer.step()
 
                     net.decoder.apply(apply_clamp_inst1)
+                    # you can just clip the weight of the parameters after each optimization update.
                     
                     if epoch % 10 == 0:
                         print('Epoch:', epoch, '| train loss: %.4f' % total_loss.data,
@@ -171,6 +176,7 @@ class Train_test:
             if self.save:
                 with open(self.save_dir + 'weights_new.pickle', 'wb') as handle:
                     pickle.dump(net.state_dict(), handle)
+                    # Write the pickled representation of the object obj to the open file object file.
                 sio.savemat(self.save_dir + f"{self.dataset}_losses.mat", {"losses": epo_vs_los})
             
             print('Total computational cost:', time_end - time_start)

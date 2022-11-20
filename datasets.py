@@ -22,7 +22,7 @@ class TrainData(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.img)
 
-
+# 实际中使用只使用了下面的Data模块，上面的TrainData只有一个参考模块
 class Data:
     def __init__(self, dataset, device):
         super(Data, self).__init__()
